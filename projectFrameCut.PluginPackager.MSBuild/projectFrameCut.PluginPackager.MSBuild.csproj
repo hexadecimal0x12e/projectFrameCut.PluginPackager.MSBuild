@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <SignAssembly>False</SignAssembly>
+
+    <GeneratePluginInfoSource Condition="'$(GeneratePluginInfoSource)' == ''">true</GeneratePluginInfoSource>
+    <GeneratePluginInfoSourcePath Condition="'$(GeneratePluginInfoSourcePath)' == ''"></GeneratePluginInfoSourcePath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>projectFrameCut.PluginPackager.MSBuild</PackageId>
+    <Version>3.0.0</Version>
+    <Authors>projectFrameCut</Authors>
+    <Description>MSBuild task and targets for creating projectFrameCut plugin packages.</Description>
+    <PackageTags>projectFrameCut;plugin;packager;msbuild</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/hexadecimal0x12e/projectFrameCut.PluginPackager.MSBuild</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <Pack>true</Pack>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include `buildTransitive/` targets so consumers get MSBuild targets automatically -->
+    <None Include="build\**\*.*" Pack="true" PackagePath="buildTransitive\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Include="readme.md" Condition="Exists('readme.md')" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

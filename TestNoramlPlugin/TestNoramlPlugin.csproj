@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+		<!--You must set all these properties below, except PluginAssetPath.-->
+
+		<!--
+	    This'll be the ID of the plugin. 
+	    It muse equals to the full name of your implementation of IPluginBase, and SHOULD NOT starts with 'projectFrameCut'.
+	  -->
+		<PackageId>nobody.MyExamplePlugin</PackageId>
+		<!--This'll be the version of the plugin.-->
+		<Version>42.42.42.42</Version>
+		<!--To create a keypair, run PluginKeyGenerator.cs -->
+		<PluginSignFilePath>D:\code\playground\projectFrameCut\key.json</PluginSignFilePath>
+		<!--This'll be the Project URL of the plugin. May be blank if you can't provide one.-->
+		<PackageProjectUrl>https://example.com/1</PackageProjectUrl>
+
+		<!--These attributes define metadata for the plugin in the neutral language. To define the metadata for other languages, use the LocalizationProvider.-->
+
+		<!--This'll be the display name of the plugin.-->
+		<Title>Example plugin</Title>
+		<!--This'll be the author of the plugin.-->
+		<Authors>none</Authors>
+		<!--This'll be the description of the plugin.-->
+		<Description>desc</Description>
+
+		<!--The path to the plugin's assets. Note this is optional.-->
+		<PluginAssetPath>D:\code\playground\projectFrameCut\plugin\asset</PluginAssetPath>
+
+		<GeneratePluginInfoSource>true</GeneratePluginInfoSource>
+		<RestoreSources>$(RestoreSources);..\projectFrameCut.PluginPackager.MSBuild\bin\Debug </RestoreSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="projectFrameCut.PluginPackager.MSBuild" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\projectFrameCut.APIBasePackage\projectFrameCut.APIBasePackage.csproj" />
+  </ItemGroup>
+
+</Project>

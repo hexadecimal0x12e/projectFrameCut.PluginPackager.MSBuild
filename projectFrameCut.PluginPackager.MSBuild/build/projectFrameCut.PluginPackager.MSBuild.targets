@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!-- Detect whether the project is being built inside Visual Studio -->
+	<PropertyGroup>
+		<IsVisualStudioBuild Condition="'$(BuildingInsideVisualStudio)' == 'true'">true</IsVisualStudioBuild>
+		<IsVisualStudioBuild Condition="'$(BuildingInsideVisualStudio)' != 'true' and '$(VisualStudioVersion)' != ''">true</IsVisualStudioBuild>
+		<IsVisualStudioBuild Condition="'$(IsVisualStudioBuild)' == ''">false</IsVisualStudioBuild>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GeneratePluginInfoSource Condition="'$(GeneratePluginInfoSource)' == ''">true</GeneratePluginInfoSource>
+		<GenerateLoader Condition="'$(GenerateLoader)' == ''">true</GenerateLoader>
+		<PluginMinorVersion Condition="'$(PluginMinorVersion)' == ''">0</PluginMinorVersion>
+		<GeneratePluginInfoSourcePath Condition="'$(GeneratePluginInfoSourcePath)' == ''"></GeneratePluginInfoSourcePath>
+
+		<_GeneratedPluginSourceDir Condition="'$(GeneratePluginInfoSourcePath)' != '' And $([System.IO.Path]::IsPathRooted('$(GeneratePluginInfoSourcePath)'))">$(GeneratePluginInfoSourcePath)</_GeneratedPluginSourceDir>
+		<_GeneratedPluginSourceDir Condition="'$(_GeneratedPluginSourceDir)' == '' And '$(GeneratePluginInfoSourcePath)' != ''">$(MSBuildProjectDirectory)\$(GeneratePluginInfoSourcePath)</_GeneratedPluginSourceDir>
+		<_GeneratedPluginSourceDir Condition="'$(_GeneratedPluginSourceDir)' == ''">$(MSBuildProjectDirectory)\obj\GeneratedSource</_GeneratedPluginSourceDir>
+		<_GeneratedPluginSourceFile>$(_GeneratedPluginSourceDir)\PluginInfo.sg.cs</_GeneratedPluginSourceFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(IsAppLevelPluginOverride)' != ''">
+		<IsAppLevelPlugin>$(IsAppLevelPluginOverride)</IsAppLevelPlugin>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(IsAppLevelPluginOverride)' == '' and '$(UseMaui)' == 'True'">
+		<IsAppLevelPlugin>True</IsAppLevelPlugin>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(IsAppLevelPluginOverride)' == '' and '$(UseMaui)' != 'True'">
+		<IsAppLevelPlugin>False</IsAppLevelPlugin>
+	</PropertyGroup>
+	<Target Name="ShowAppLevelPlugin">
+		<Message Importance="high" Text="IsAppLevelPlugin=$(IsAppLevelPlugin)" />
+	</Target>
+
+	<!--
+		Plugin ID is computed at target execution time (inside targets below), not here.
+		Reason: properties like PluginIDOverride may be set by later imports (e.g. Directory.Build.targets).
+	-->
+
+	<Target Name="DetectBuildEnvironment" BeforeTargets="BeforeBuild">
+		<Message Text="Build environment detected: IsVisualStudioBuild=$(IsVisualStudioBuild)" Importance="High" />
+	</Target>
+
+	<!-- Default assembly path resolution (prefer net10.0 if available, fallback to netstandard2.0). -->
+	<PropertyGroup>
+		<!-- Only use net10.0 if running on .NET Core (dotnet build) -->
+		<_PluginPackagerDllPath Condition="'$(MSBuildRuntimeType)' == 'Core' And Exists('$(MSBuildThisFileDirectory)..\lib\net10.0\projectFrameCut.PluginPackager.MSBuild.dll')">$(MSBuildThisFileDirectory)..\lib\net10.0\projectFrameCut.PluginPackager.MSBuild.dll</_PluginPackagerDllPath>
+		<!-- Fallback to netstandard2.0 for Visual Studio (Full Framework) or if net10.0 is missing -->
+		<_PluginPackagerDllPath Condition="'$(_PluginPackagerDllPath)' == '' And Exists('$(MSBuildThisFileDirectory)..\lib\netstandard2.0\projectFrameCut.PluginPackager.MSBuild.dll')">$(MSBuildThisFileDirectory)..\lib\netstandard2.0\projectFrameCut.PluginPackager.MSBuild.dll</_PluginPackagerDllPath>
+	</PropertyGroup>
+
+	<Target Name="VisualStudioBuildWarning" BeforeTargets="BeforeBuild" Condition="'$(IsVisualStudioBuild)' == 'true'">
+		<Message Text="To bundle a plugin, please use the 'dotnet' command line tool, instead of Visual Studio." Importance="High" />
+	</Target>
+	<PropertyGroup Condition="'$(IsVisualStudioBuild)' == 'false' Or '$(BundlePlugin)' == 'true'">
+		<IsVisualStudioBuild>false</IsVisualStudioBuild>
+	</PropertyGroup>
+
+	<Target Name="CleanPublishDir" BeforeTargets="BeforePublish" Condition="'$(IsVisualStudioBuild)' == 'false' Or '$(BundlePlugin)' == 'true'">
+		<PropertyGroup>
+			<_ActualPublishDir Condition="'$(PublishDir)' != ''">$(PublishDir)</_ActualPublishDir>
+			<_ActualPublishDir Condition="'$(PublishDir)' == ''">$(OutputPath)publish\</_ActualPublishDir>
+		</PropertyGroup>
+		<Message Text="Cleaning publish directory: $(_ActualPublishDir)" Importance="High" />
+		<RemoveDir Directories="$(_ActualPublishDir)" Condition="Exists('$(_ActualPublishDir)')" />
+	</Target>
+
+
+	<UsingTask TaskName="projectFrameCut.PluginPackager.MSBuild.PluginBuilder"
+             AssemblyFile="$(_PluginPackagerDllPath)" />
+	<!-- Include generated source file in compilation -->
+	<ItemGroup>
+		<Compile Include="$(_GeneratedPluginSourceFile)" />
+	</ItemGroup>
+
+
+	<!--
+		Run before CoreCompile so Visual Studio design-time builds (IntelliSense) also see PluginInfo.sg.cs.
+		Keeping BeforeBuild as well covers the traditional build pipeline.
+	-->
+	<Target Name="GeneratePluginSource" BeforeTargets="CoreCompile;BeforeBuild">
+		<PropertyGroup>
+			<_OutDir>$(OutputPath)</_OutDir>
+
+			<!-- Determine effective PluginID as late as possible so overrides from later imports apply. -->
+			<_PluginID Condition="'$(PluginIDOverride)' != ''">$(PluginIDOverride)</_PluginID>
+			<_PluginID Condition="'$(_PluginID)' == '' And '$(PackageId)' != ''">$(PackageId)</_PluginID>
+			<_PluginID Condition="'$(_PluginID)' == ''">$(AssemblyName)</_PluginID>
+		</PropertyGroup>
+		<PluginBuilder
+			IsGenerateSourceStage="true"
+			SignFilePath="none"
+			OutputDirectory="$(_OutDir)"
+			ProjectRootPath="$(MSBuildProjectDirectory)"
+			PluginOutputPath="$(MSBuildProjectFullPath)"
+			PluginID="$(_PluginID)"
+			Authors="$(Authors)"
+			NeutralLanguageDisplayName="$(Title)"
+			NeutralLanguageDescription="$(Description)"
+			PluginVersion="$(Version)"
+			PluginProjectUrl="$(PackageProjectUrl)"
+			PluginPublishUrl="$(PluginPublishUrl)"
+			IsAppLevelPlugin="$(IsAppLevelPlugin)"
+			GenerateSource="$(GeneratePluginInfoSource)"
+			GenerateLoader="$(GenerateLoader)"
+			PluginMinorVersion="$(PluginMinorVersion)"
+			GenerateSourcePath="$(GeneratePluginInfoSourcePath)" />
+
+	</Target>
+
+	<Target Name="PackagePlugin" AfterTargets="Publish">
+		<PropertyGroup>
+			<BundlePublishOutputs Condition="'$(BundlePublishOutputs)' == ''">true</BundlePublishOutputs>
+			<IncludeMainAssemblyPlain Condition="'$(IncludeMainAssemblyPlain)' == ''">false</IncludeMainAssemblyPlain>
+		</PropertyGroup>
+		<PropertyGroup>
+			<!-- Use PublishDir when publishing (dotnet publish -o); fall back to OutputPath otherwise -->
+			<_OutDir Condition="'$(PublishDir)' != ''">$(PublishDir)</_OutDir>
+			<_OutDir Condition="'$(PublishDir)' == ''">$(OutputPath)</_OutDir>
+
+			<!-- Determine effective PluginID as late as possible so overrides from later imports apply. -->
+			<_PluginID Condition="'$(PluginIDOverride)' != ''">$(PluginIDOverride)</_PluginID>
+			<_PluginID Condition="'$(_PluginID)' == '' And '$(PackageId)' != ''">$(PackageId)</_PluginID>
+			<_PluginID Condition="'$(_PluginID)' == ''">$(AssemblyName)</_PluginID>
+		</PropertyGroup>
+		<PluginBuilder
+			IsGenerateSourceStage="false"
+      ProjectRootPath="$(MSBuildProjectDirectory)"
+      SignFilePath="$(PluginSignFilePath)"
+      AssetPath="$(PluginAssetPath)"
+      OutputDirectory="$(_OutDir)"
+      TargetFrameworkID="$(TargetFramework)"
+      PluginOutputPath="$(MSBuildProjectFullPath)"
+      Authors="$(Authors)"
+      PluginProjectUrl="$(PackageProjectUrl)"
+      NeutralLanguageDescription="$(Description)"
+      PluginID="$(_PluginID)"
+      PluginVersion="$(Version)"
+		  IsAppLevelPlugin="$(IsAppLevelPlugin)"
+      NeutralLanguageDisplayName="$(Title)"
+      BundlePublishOutputs="$(BundlePublishOutputs)"
+      IncludeMainAssemblyPlain="$(IncludeMainAssemblyPlain)"
+      BundleExcludePatterns="$(BundleExcludePatterns)"
+      GenerateLoader="$(GenerateLoader)">
+			<Output TaskParameter="PluginPackagePath" PropertyName="GeneratedPluginPackage" />
+		</PluginBuilder>
+
+		<Message Text="Generated plugin package: $(GeneratedPluginPackage)" Importance="High" />
+	</Target>
+
+</Project>

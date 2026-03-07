@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="projectFrameCut.APIBasePackage/projectFrameCut.APIBasePackage.csproj" Id="0d0e162f-7cd4-4596-90a9-12f9b1c01f68" />
+  <Project Path="projectFrameCut.PluginPackager.MSBuild/projectFrameCut.PluginPackager.MSBuild.csproj" />
+  <Project Path="TestAppLevelPlugin/TestAppLevelPlugin.csproj" Id="5d32400b-7b38-4f71-a388-e0b9027c37ad" />
+  <Project Path="TestNoramlPlugin/TestNoramlPlugin.csproj" Id="ece054ae-5695-419c-9dfe-d99924363628" />
+  <Project Path="TestReferenceMixedPlugin/TestReferenceMixedPlugin.csproj" Id="73deaea0-3a63-4f6e-a498-a6b29db8aaa6" />
+</Solution>

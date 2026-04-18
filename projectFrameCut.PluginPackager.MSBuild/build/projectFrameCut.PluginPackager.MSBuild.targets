@@ -11,7 +11,9 @@
 	<PropertyGroup>
 		<GeneratePluginInfoSource Condition="'$(GeneratePluginInfoSource)' == ''">true</GeneratePluginInfoSource>
 		<GenerateLoader Condition="'$(GenerateLoader)' == ''">true</GenerateLoader>
+    <PluginMajorVersion Condition="'$(PluginMajorVersion)' == ''">3</PluginMajorVersion>
 		<PluginMinorVersion Condition="'$(PluginMinorVersion)' == ''">0</PluginMinorVersion>
+   <AppLevelPluginMajorVersion Condition="'$(AppLevelPluginMajorVersion)' == ''">3</AppLevelPluginMajorVersion>
 		<GeneratePluginInfoSourcePath Condition="'$(GeneratePluginInfoSourcePath)' == ''"></GeneratePluginInfoSourcePath>
 
 		<_GeneratedPluginSourceDir Condition="'$(GeneratePluginInfoSourcePath)' != '' And $([System.IO.Path]::IsPathRooted('$(GeneratePluginInfoSourcePath)'))">$(GeneratePluginInfoSourcePath)</_GeneratedPluginSourceDir>
@@ -105,7 +107,9 @@
 			IsAppLevelPlugin="$(IsAppLevelPlugin)"
 			GenerateSource="$(GeneratePluginInfoSource)"
 			GenerateLoader="$(GenerateLoader)"
+      PluginMajorVersion="$(PluginMajorVersion)"
 			PluginMinorVersion="$(PluginMinorVersion)"
+     AppLevelPluginMajorVersion="$(AppLevelPluginMajorVersion)"
 			GenerateSourcePath="$(GeneratePluginInfoSourcePath)" />
 
 	</Target>
@@ -140,6 +144,9 @@
       PluginVersion="$(Version)"
 		  IsAppLevelPlugin="$(IsAppLevelPlugin)"
       NeutralLanguageDisplayName="$(Title)"
+      PluginMajorVersion="$(PluginMajorVersion)"
+			PluginMinorVersion="$(PluginMinorVersion)"
+			AppLevelPluginMajorVersion="$(AppLevelPluginMajorVersion)"
       BundlePublishOutputs="$(BundlePublishOutputs)"
       IncludeMainAssemblyPlain="$(IncludeMainAssemblyPlain)"
       BundleExcludePatterns="$(BundleExcludePatterns)"

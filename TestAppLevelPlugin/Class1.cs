@@ -1,4 +1,5 @@
-﻿using projectFrameCut.ApplicationAPIBase.Effect;
+﻿using projectFrameCut.ApplicationAPIBase.DynamicPreviewProvider;
+using projectFrameCut.ApplicationAPIBase.Effect;
 using projectFrameCut.ApplicationAPIBase.Plugins;
 using projectFrameCut.Render.RenderAPIBase.ClipAndTrack;
 using projectFrameCut.Render.RenderAPIBase.EffectAndMixture;
@@ -13,9 +14,11 @@ namespace nobody
     {
         public Dictionary<string, Func<IEffectBundle>> EffectBundleProvider => new();
 
-        Dictionary<string, Dictionary<string, string>> IPluginBase.LocalizationProvider => new();
+        public Dictionary<string, IClipDynamicPreviewProvider> ClipDynamicPreviewProvider => new();
 
-        Dictionary<string, Func<string, string, IClip>> IPluginBase.ClipProvider => new();
+        public Dictionary<string, IEffectDynamicPreviewProvider> EffectDynamicPreviewProvider => new();
+
+        Dictionary<string, Dictionary<string, string>> IPluginBase.LocalizationProvider => new();
 
         Dictionary<string, Func<string, string, ISoundTrack>> IPluginBase.SoundTrackProvider => new();
 

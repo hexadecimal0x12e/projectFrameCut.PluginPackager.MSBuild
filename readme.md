@@ -12,12 +12,24 @@
 <PackageReference Include="projectFrameCut.PluginPackager.MSBuild" Version="3.0.0" />
 ```
 
-2. 导入后，使用`dotnet publish`命令来发布，这时会触发打包任务并在输出目录生成插件包。
+2. 配置插件API版本号和签名：
+```xml
+<PropertyGroup>
+        ...
+	<PluginMajorVersion>4</PluginMajorVersion>
+	<AppLevelPluginMajorVersion>4</AppLevelPluginMajorVersion>
+    <PluginMinorVersion>0</PluginMinorVersion>
+    <PluginSignFilePath>D:\path\key.json</PluginSignFilePath>
+        ...
+</PropertyGroup>
+```
+
+3. 使用`dotnet publish`命令来发布，这时会触发打包任务并在输出目录生成插件包。
 
 # 打包器配置
 打包器向MSBuild提供了一些参数来控制打包器的行为：
 ### 基础信息
-这些配置不是由打包器特有的，而是标准的NuGet包属性：
+**你必须配置他们**，这些配置不是由打包器特有的，而是标准的NuGet包属性：
 * `PackageId`： 插件的包ID，也会作为它的唯一标识符，
     **请确保他和你的插件类的全名一致，并且不得以`projectFrameCut`开头（不区分大小写）**。 
     如果同时配置了`PluginIDOverride`和`PackageId`，打包器会使用`PluginIDOverride`的值作为插件ID。
@@ -29,10 +41,24 @@
 * `Authors`： 插件的作者
 * `Description`： 插件的描述
 
+### 插件API版本
+**你必须配置他们**，来告诉打包器你的插件是基于哪个版本的插件API开发的，否则打包器会报错。
+* `PluginMajorVersion`：插件API的主版本号，必须设置这个属性来告诉打包器你的插件是基于哪个版本的插件API开发的。
+* `AppLevelPluginMajorVersion`：应用程序级插件API的主版本号，必须设置这个属性来告诉打包器你的插件是基于哪个版本的应用程序级插件API开发的。
+* `PluginMinorVersion`：插件API的次版本号，默认为0，可以不设置这个属性。
+
 ### 签名
 * `PluginSignFilePath`：必须设置这个属性来配置签名密钥
-    最方便的方式是使用`PluginKeyGenerator.cs`来生成一个签名文件。
+    最方便的方式是使用[插件模板](https://github.com/hexadecimal0x12e/projectFrameCut.PluginTemplate)里提供的`PluginKeyGenerator.cs`来生成一个签名文件。
+
     如果你想要手动构建签名文件，你需要先准备一个Base64格式的PKCS #8密钥对，然后创建一个JSON文件，填入公钥到签名文件的`Key`字段，填入私钥到`Value`字段。
+    类似于这样：
+    ```json
+    {
+        "Key": "-----BEGIN PUBLIC KEY-----\nMIIBIjAN***(REDACTED)***BgQAB\r\n-----END PUBLIC KEY-----\n",
+        "Value": "-----BEGIN PRIVATE KEY-----\nMII***(REDACTED)***4VnM=\r\n-----END PRIVATE KEY-----\n"
+    }
+    ```
 
 ### 素材
 * `PluginAssetPath`：插件素材的路径，打包器会把这个路径下的所有文件都包含进插件包里。如果不需要素材，可以不设置这个属性。

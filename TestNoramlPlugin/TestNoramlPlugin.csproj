@@ -32,6 +32,8 @@
 
 		<GeneratePluginInfoSource>true</GeneratePluginInfoSource>
 		<RestoreSources>$(RestoreSources);..\projectFrameCut.PluginPackager.MSBuild\bin\Debug </RestoreSources>
+		<PluginMajorVersion>4</PluginMajorVersion>
+		<AppLevelPluginMajorVersion>4</AppLevelPluginMajorVersion>
   </PropertyGroup>
 
   <ItemGroup>

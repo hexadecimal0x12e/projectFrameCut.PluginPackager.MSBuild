@@ -19,8 +19,8 @@ namespace projectFrameCut.PluginPackager.MSBuild
 {
     public class PluginBuilder : Microsoft.Build.Utilities.Task
     {
-        public const int CurrentPluginAPIVersion = 3;
-        public const int CurrentAppLevelPluginVersion = 3;
+        public const int CurrentPluginAPIVersion = 4;
+        public const int CurrentAppLevelPluginVersion = 4;
         public const int CurrentPluginAPIMinorVersion = 0;
 
         private static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -35,7 +35,7 @@ namespace projectFrameCut.PluginPackager.MSBuild
                 try
                 {
                     var path = PartialClassGenerator.GeneratePartialClassFile(
-                        PluginID, PluginVersion, PluginPublishUrl, NeutralLanguageDisplayName, Authors, NeutralLanguageDescription, PluginProjectUrl, ProjectRootPath, GenerateSource, IsAppLevelPlugin, PluginMinorVersion, GenerateLoader, GenerateSourcePath);
+                        PluginID, PluginVersion, PluginPublishUrl, NeutralLanguageDisplayName, Authors, NeutralLanguageDescription, PluginProjectUrl, ProjectRootPath, GenerateSource, IsAppLevelPlugin, PluginMajorVersion, PluginMinorVersion, AppLevelPluginMajorVersion, GenerateLoader, GenerateSourcePath);
                     Log.LogMessage(MessageImportance.High, $"Generated plugin source: {path}");
                     return true;
                 }
@@ -130,7 +130,7 @@ namespace projectFrameCut.PluginPackager.MSBuild
                     PluginID = PluginID,
                     Version = ver,
                     Name = NeutralLanguageDisplayName,
-                    PluginAPIVersion = 1,
+                    PluginAPIVersion = PluginMajorVersion,
                     PublishingUrl = PluginPublishUrl
 
                 };
@@ -491,7 +491,9 @@ namespace projectFrameCut.PluginPackager.MSBuild
 
         public bool GenerateSource { get; set; } = true;
         public bool GenerateLoader { get; set; } = true;
+        public int PluginMajorVersion { get; set; } = CurrentPluginAPIVersion;
         public int PluginMinorVersion { get; set; } = 0;
+        public int AppLevelPluginMajorVersion { get; set; } = CurrentAppLevelPluginVersion;
         public string GenerateSourcePath { get; set; }
 
         /// <summary>

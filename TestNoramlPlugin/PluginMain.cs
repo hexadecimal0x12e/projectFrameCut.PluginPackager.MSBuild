@@ -10,8 +10,6 @@ namespace nobody
     {
         Dictionary<string, Dictionary<string, string>> IPluginBase.LocalizationProvider => new();
 
-        Dictionary<string, Func<string, string, IClip>> IPluginBase.ClipProvider => new();
-
         Dictionary<string, Func<string, string, ISoundTrack>> IPluginBase.SoundTrackProvider => new();
 
         Dictionary<string, Func<Guid, Guid, ITransform>> IPluginBase.TransformProvider => new();

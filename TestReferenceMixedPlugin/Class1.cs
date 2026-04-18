@@ -1,4 +1,5 @@
-﻿using projectFrameCut.ApplicationAPIBase.Effect;
+﻿using projectFrameCut.ApplicationAPIBase.DynamicPreviewProvider;
+using projectFrameCut.ApplicationAPIBase.Effect;
 using projectFrameCut.ApplicationAPIBase.Plugins;
 
 namespace TestReferenceMixedPlugin
@@ -7,6 +8,10 @@ namespace TestReferenceMixedPlugin
     public partial class TestReferenceMixedPlugin : nobody.MyExamplePlugin, IApplicationPluginBase
     {
         public int AppLevelPluginAPIVersion => 3;
+
+        public Dictionary<string, IClipDynamicPreviewProvider> ClipDynamicPreviewProvider => new();
+
+        public Dictionary<string, IEffectDynamicPreviewProvider> EffectDynamicPreviewProvider => new();
 
         Dictionary<string, Func<IEffectBundle>> IApplicationPluginBase.EffectBundleProvider => new();
 

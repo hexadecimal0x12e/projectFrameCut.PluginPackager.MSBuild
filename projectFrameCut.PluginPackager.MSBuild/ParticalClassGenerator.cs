@@ -6,7 +6,7 @@ namespace projectFrameCut.PluginPackager.MSBuild
 {
     public static class PartialClassGenerator
     {
-        public static string GeneratePartialClassFile(string PluginID, string PluginVersion, string PluginPublishUrl, string NeutralLanguageDisplayName, string Authors, string NeutralLanguageDescription, string PluginProjectUrl, string ProjectRootPath, bool GenerateInfo, bool isAppLevel = false, int minorVersion = 0, bool GenerateLoader = true, string generatedOutputDirectory = null)
+        public static string GeneratePartialClassFile(string PluginID, string PluginVersion, string PluginPublishUrl, string NeutralLanguageDisplayName, string Authors, string NeutralLanguageDescription, string PluginProjectUrl, string ProjectRootPath, bool GenerateInfo, bool isAppLevel = false, int pluginMajorVersion = PluginBuilder.CurrentPluginAPIVersion, int minorVersion = 0, int appLevelPluginMajorVersion = PluginBuilder.CurrentAppLevelPluginVersion, bool GenerateLoader = true, string generatedOutputDirectory = null)
         {
             if (string.IsNullOrWhiteSpace(PluginID)) throw new InvalidOperationException("PluginID is required to generate plugin source.");
             var idx = PluginID.LastIndexOf('.');
@@ -49,7 +49,7 @@ namespace projectFrameCut.PluginPackager.MSBuild
                 writer.AppendLine($"    public partial class {className}");
                 writer.AppendLine("    {");
                 writer.AppendLine($"        public string PluginID => {ToCSharpStringLiteral(PluginID)};");
-                writer.AppendLine($"        public int PluginAPIVersion => {PluginBuilder.CurrentPluginAPIVersion};");
+                writer.AppendLine($"        public int PluginAPIVersion => {pluginMajorVersion};");
                 writer.AppendLine($"        public int PluginAPIMinorVersion => {minorVersion};");
                 writer.AppendLine($"        public string Name => {ToCSharpStringLiteral(NeutralLanguageDisplayName)};");
                 writer.AppendLine($"        public string Author => {ToCSharpStringLiteral(Authors)};");
@@ -59,7 +59,7 @@ namespace projectFrameCut.PluginPackager.MSBuild
                 writer.AppendLine($"        public string PublishingUrl => {ToCSharpStringLiteral(publishExpr)};");
                 if (isAppLevel)
                 {
-                    writer.AppendLine($"                public int AppLevelPluginAPIVersion => {PluginBuilder.CurrentAppLevelPluginVersion};");
+                    writer.AppendLine($"                public int AppLevelPluginAPIVersion => {appLevelPluginMajorVersion};");
                 }
                 writer.AppendLine("    }");
                 writer.AppendLine("}");
@@ -77,7 +77,7 @@ namespace projectFrameCut.PluginPackager.MSBuild
                 writer.AppendLine("    [GeneratedCode(\"projectFrameCut.PluginPackager.MSBuild\", null)]");
                 writer.AppendLine($"    public partial class {loaderName}");
                 writer.AppendLine("    {");
-                writer.AppendLine($"        public static int PluginAPIVersion => {PluginBuilder.CurrentPluginAPIVersion};");
+                writer.AppendLine($"        public static int PluginAPIVersion => {pluginMajorVersion};");
                 writer.AppendLine("        public static string LocaleId = \"en-US\";");
                 writer.AppendLine("        public static string PluginRoot = string.Empty;");
                 writer.AppendLine();

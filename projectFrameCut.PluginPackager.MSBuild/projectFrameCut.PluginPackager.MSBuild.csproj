@@ -11,7 +11,7 @@
 
   <PropertyGroup>
     <PackageId>projectFrameCut.PluginPackager.MSBuild</PackageId>
-    <Version>3.0.0</Version>
+    <Version>4.0.0</Version>
     <Authors>projectFrameCut</Authors>
     <Description>MSBuild task and targets for creating projectFrameCut plugin packages.</Description>
     <PackageTags>projectFrameCut;plugin;packager;msbuild</PackageTags>
